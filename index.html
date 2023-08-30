@@ -1,34 +1,3 @@
-<?php
-
-$conn = new mysqli('localhost', "root", "", "ratingSystem") ;
-if(isset($_POST['save'])){
-    $uID = $conn->real_escape_string( $_POST['uID']);
-    $ratedIndex = $conn->real_escape_string($_POST['ratedIndex']);
-    // $comment = $conn->real_escape_string($_POST['comment']);
-    $ratedIndex ++;
-    if(!$uID){
-        $conn->query("INSERT INTO stars (ratedIndex) VALUES('$ratedIndex')");
-        $sql = $conn->query("SELECT id FROM stars ORDER BY id DESC LIMIT 1");
-        $uData = $sql->fetch_assoc();
-        $uID = $uData['id'];
-        echo "succesefully";
-    }else{
-        $conn->query("UPDATE stars SET retedIndex = `$ratedIndex` where id = '$uID'");
-    }
-    exit(json_encode(array('id'=> $uID)));
-}
-
-$sql = $conn->query('SELECT id From stars');
-$numR = $sql->num_rows;
-
-$sql = $conn->query('SELECT SUM (ratedIndex) as total from stars');
-$rDATA = $sql->fetch_array();
-$total = $rDATA['total'];
-$avg = $total / $numR;
-var_dump($_POST);
-
-?>
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -70,7 +39,7 @@ var_dump($_POST);
             <i class="fa fa-star star-rate" data-index="3"></i>
             <i class="fa fa-star star-rate" data-index="4"></i>
           </div>
-          <textarea name="" id="" placeholder="your feedback" name="comment"></textarea>
+          <textarea name="" id="" placeholder="your feedback"></textarea>
           <button type="submit">send</button>
         </form>
       </div>
@@ -89,11 +58,9 @@ var_dump($_POST);
       let ratedIndex = -1, uID = 0;
       $(document).ready(function () {
         resetStarColors();
-        if (localStorage.getItem("ratedIndex") != null){
-            uID = localStorage.getItem("uID")
-            setStars(localStorage.getItem("ratedIndex"))
-            console.log("bu rating bor");
-        }
+        if (localStorage.getItem("ratedIndex") != null)
+        setStars(localStorage.getItem("ratedIndex"))
+          console.log("bu rating bor");
       
         $(".fa-star").on("click", function () {
           ratedIndex = parseInt($(this).data("index"));
@@ -121,8 +88,7 @@ var_dump($_POST);
                 uID:uID,
                 ratedIndex: ratedIndex
             }, success :function(r){
-                uID = r.id;
-                localStorage.setItem('uID', uID)
+                uID = r.uid;
             }
         })
       }
